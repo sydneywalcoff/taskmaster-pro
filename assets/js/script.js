@@ -45,7 +45,7 @@ var saveTasks = function() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
 };
 
-// delegated `p` click using the parent `.list-group`
+// editing a task p by creating textarea on click
 $(".list-group").on("click", "p", function() {
   var text = $(this).text().trim();
   // creation of textInput form
@@ -87,13 +87,21 @@ $(".list-group").on("click", "span", function() {
   // swap out elements
   $(this).replaceWith(dateInput);
 
+  // enable jquery ui datepicker
+  dateInput.datepicker({
+    minDate: 1,
+    onClose: function() {
+      $(this).trigger("change");
+    }
+  });
+
   // automatically focus on new element when clicked
   dateInput.trigger("focus");
 
 });
 
-// unfocus on date input
-$(".list-group").on("blur", "input[type='text']", function(){
+// unfocus date input on click away
+$(".list-group").on("change", "input[type='text']", function(){
   // get current text and trim whitespace
   var date = $(this)
     .val()
@@ -168,7 +176,7 @@ $(".card .list-group").sortable({
   }
 });
 
-// making trash droppable
+// make trash droppable
 $("#trash").droppable({
   accept: ".card .list-group-item",
   tolerance: "touch",
@@ -193,6 +201,11 @@ $("#task-form-modal").on("show.bs.modal", function() {
 $("#task-form-modal").on("shown.bs.modal", function() {
   // highlight textarea
   $("#modalTaskDescription").trigger("focus");
+});
+
+// modal date picker
+$("#modalDueDate").datepicker( {
+  minDate: 1
 });
 
 // save button in modal was clicked
