@@ -13,6 +13,9 @@ var createTask = function(taskText, taskDate, taskList) {
   // append span and p element to parent li
   taskLi.append(taskSpan, taskP);
 
+  // check due date
+  auditTask(taskLi);
+
 
   // append to ul list on the page
   $("#list-" + taskList).append(taskLi);
@@ -44,6 +47,29 @@ var loadTasks = function() {
 var saveTasks = function() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
 };
+
+// audit task due dates
+var auditTask = function(taskEl) {
+  // get date from task element
+  var date = $(taskEl).find("span").text().trim();
+  console.log(date);
+
+  // convert to moment object at 5pm
+  var time = moment(date, "L").set("hour", 17);
+  console.log(time);
+
+  // remove old classes from element
+  $(taskEl).removeClass("list-group-item-warning list-group-item-danger");
+
+  // apply new class if task is near/over due date
+  if(moment().isAfter(time)) {
+    $(taskEl).addClass("list-group-item-danger");
+  }
+  else if (Math.abs(moment().diff(time, "days")) <= 2) {
+    $(taskEl).addClass("list-group-item-warning");
+  };
+};
+
 
 // editing a task p by creating textarea on click
 $(".list-group").on("click", "p", function() {
@@ -128,6 +154,9 @@ $(".list-group").on("change", "input[type='text']", function(){
 
   // replace input with span element
   $(this).replaceWith(taskSpan);
+
+  // pass task's <li> element into auditTask() to check new due date
+  auditTask($(taskSpan)).closest(".list-group-item");
 });
 
 // makes the lists sortable across lists and within themselves
@@ -208,7 +237,7 @@ $("#modalDueDate").datepicker( {
   minDate: 1
 });
 
-// save button in modal was clicked
+// save button in modal event listener 
 $("#task-form-modal .btn-primary").click(function() {
   // get form values
   var taskText = $("#modalTaskDescription").val();
@@ -238,6 +267,7 @@ $("#remove-tasks").on("click", function() {
   }
   saveTasks();
 });
+
 
 // load tasks for the first time
 loadTasks();
