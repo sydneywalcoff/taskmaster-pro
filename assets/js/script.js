@@ -52,11 +52,9 @@ var saveTasks = function() {
 var auditTask = function(taskEl) {
   // get date from task element
   var date = $(taskEl).find("span").text().trim();
-  console.log(date);
 
   // convert to moment object at 5pm
   var time = moment(date, "L").set("hour", 17);
-  console.log(time);
 
   // remove old classes from element
   $(taskEl).removeClass("list-group-item-warning list-group-item-danger");
@@ -273,3 +271,9 @@ $("#remove-tasks").on("click", function() {
 loadTasks();
 
 
+setInterval(function() {
+  $(".card .list-group-item").each(function(index, el) {
+    auditTask(el);
+  });
+  
+}, 1800000);
